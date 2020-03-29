@@ -138,7 +138,6 @@ class UploadController(
     }
 
 
-
     @RequestMapping(value = ["/upload/{assignmentId}"], method = [(RequestMethod.GET)])
     fun getUploadForm(model: ModelMap, principal: Principal,
                       @PathVariable("assignmentId") assignmentId: String,

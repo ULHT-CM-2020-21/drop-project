@@ -86,15 +86,16 @@ class ApplicationContextListener(val assignmentRepository: AssignmentRepository,
                 "AuLePMf3HVfo+TasVLLCelYa1Z+o0qU+VusSF61/pm2f/WTeOtGgwUJJXDwg+Ekl+FKc/C" +
                 "7w/Mu9SDlvi7+VUTcmJ6r5CIoqJoVXiNqXGoPdAeklPiakBsIdFr+0KwJuUYQ55BiWgjw5" +
                 "bUulg6laTAM/NMSx64IXp8n9hWDaKIqew7s6e69+gLM3h6b82FlacupJUp"
+
     }
 
     val LOG = LoggerFactory.getLogger(this.javaClass.name)
 
     @Value("\${dropProject.maven.home}")
-    val mavenHome : String = ""
+    val mavenHome: String = ""
 
     @Value("\${dropProject.maven.repository}")
-    val mavenRepository : String = ""
+    val mavenRepository: String = ""
 
     @Value("\${assignments.rootLocation}")
     val assignmentsRootLocation: String = ""
@@ -135,8 +136,9 @@ class ApplicationContextListener(val assignmentRepository: AssignmentRepository,
                 // only save if it successfully cloned the assignment
                 assignmentRepository.save(assignment)
 
+                // TODO VOLTAR A MUDAR authorUserId para "student1"
+                assigneeRepository.save(Assignee(assignmentId = assignment.id, authorUserId = "a21705201"))
                 assigneeRepository.save(Assignee(assignmentId = assignment.id, authorUserId = "student1"))
-                assigneeRepository.save(Assignee(assignmentId = assignment.id, authorUserId = "student2"))
 
                 connected = true
 
@@ -161,7 +163,7 @@ class ApplicationContextListener(val assignmentRepository: AssignmentRepository,
 
     private fun uploadStudentSubmission(author: Author, submissionDate: String, submissionName: String,
                                         teacherTestsIndicator: String, teacherTestsProgress: Int,
-                                        teacherTestsGoal: Int) : Long {
+                                        teacherTestsGoal: Int): Long {
 
         val submission = Submission(submissionId = "1",
                 submissionDate = Timestamp.valueOf(LocalDateTime.parse(submissionDate)),
@@ -173,7 +175,7 @@ class ApplicationContextListener(val assignmentRepository: AssignmentRepository,
         submissionRepository.save(submission)
 
         val groups = projectGroupRepository.getGroupsForAuthor(author.userId)
-        lateinit var group : ProjectGroup
+        lateinit var group: ProjectGroup
         if (groups.isEmpty()) {
             group = ProjectGroup()
             group.authors.add(author)

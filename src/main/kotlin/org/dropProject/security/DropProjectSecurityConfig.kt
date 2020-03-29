@@ -33,6 +33,7 @@ open class DropProjectSecurityConfig : WebSecurityConfigurerAdapter() {
                     .antMatchers(HttpMethod.GET, "/assignment/**").hasRole("TEACHER")
                     .antMatchers(HttpMethod.POST, "/assignment/**").hasRole("TEACHER")
                     .antMatchers(
+                            "/getSubmissionList",
                             "/report",
                             "/submission-report",
                             "/submissions",
