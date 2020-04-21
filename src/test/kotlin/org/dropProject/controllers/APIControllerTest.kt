@@ -80,6 +80,8 @@ class APIControllerTest {
             testsHelper.createAndSetupAssignment(mvc, assignmentRepository, "dummyAssignment1", "Dummy Assignment",
                     "org.dummy",
                     "UPLOAD", "git@github.com:palves-ulht/sampleJavaAssignment.git",
+
+                    language = "KOTLIN",
                     assignees = "student1")
 
 
@@ -90,6 +92,7 @@ class APIControllerTest {
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     // .andDo(MockMvcResultHandlers.print())
                     .andExpect(jsonPath("$[0].assignmentId", Matchers.equalTo("dummyAssignment1")))
+                    .andExpect(jsonPath("$[0].language", Matchers.equalTo("KOTLIN")))
 
         } finally {
 
