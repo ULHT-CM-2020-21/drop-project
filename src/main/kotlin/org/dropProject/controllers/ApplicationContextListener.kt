@@ -157,6 +157,14 @@ class ApplicationContextListener(val assignmentRepository: AssignmentRepository,
                 val author2 = Author(name = "Student 2", userId = "student2")
                 authorRepository.save(author2)
                 uploadStudentSubmission(author2, "2019-01-02T14:55:30", "javaSubmissionOk", "OK", 2, 2)
+
+                // TODO: DELETE BEFORE LAST COMMIT
+                val author3 = Author(name = "Yash", userId = "a21705201")
+                authorRepository.save(author3)
+                uploadStudentSubmission(author3, "2019-01-01T10:34:00", "javaSubmissionError", "NOK", 1, 10)
+                uploadStudentSubmission(author3, "2020-01-02T19:05:03", "javaSubmissionError", "NOK", 5, 10)
+                uploadStudentSubmission(author3, "2020-02-10T23:34:00", "javaSubmissionError", "NOK", 6, 10)
+                uploadStudentSubmission(author3, "2020-03-02T17:05:03", "javaSubmissionOk", "OK", 10, 10)
             }
         }
     }

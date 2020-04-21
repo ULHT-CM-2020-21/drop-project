@@ -18,11 +18,14 @@
 
 package org.dropProject.controllers
 
+import org.apache.poi.ss.formula.functions.T
 import org.springframework.web.bind.annotation.*
 import org.dropProject.dao.Language
 import org.dropProject.dao.Submission
 import org.dropProject.dao.SubmissionStatus
 import org.dropProject.data.JUnitSummary
+import org.dropProject.data.TestType
+import org.dropProject.extensions.formatDefault
 import org.dropProject.extensions.realName
 import org.dropProject.repository.*
 import org.dropProject.services.AssignmentTeacherFiles
@@ -31,13 +34,15 @@ import org.springframework.http.RequestEntity
 import org.springframework.ui.ModelMap
 import java.math.BigDecimal
 import java.security.Principal
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.security.auth.message.callback.SecretKeyCallback
 import javax.servlet.http.HttpServletRequest
 
-val formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm")
+val formatter = DateTimeFormatter.ofPattern("dd MMM YYYY HH:mm")
+val dateFormater = SimpleDateFormat("dd MMM YYYY HH:mm")
 
 @RestController
 @RequestMapping("/api/v1")
@@ -72,30 +77,40 @@ class APIController(val assigneeRepository: AssigneeRepository,
 
     @GetMapping(value = ["/submissionsList/{assignmentId}"])
     fun getStudentAssignmentSubmissions(principal: Principal, @PathVariable assignmentId: String): List<SubmissionInformation> {
+
         val submissionsList = submissionRepository.findBySubmitterUserIdAndAssignmentId(principal.realName(), assignmentId)
+
         return submissionsList.map { submission ->
             val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
             val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                     submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
             val buildReportDB = buildReportRepository.getOne(submission.buildReportId)
-            val s = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
-            mavenizedProjectFolder.absolutePath, assignment, submission).mavenOutputLines
-
-            s.forEach { a -> println(a) }
+            val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
+                    mavenizedProjectFolder.absolutePath, assignment, submission)
 
 
             submission.structureErrors?.split(";")
-            SubmissionInformation(submission.id,
-                    submission.submissionDate,
-                    s)
+
+            val date = dateFormater.format(submission.submissionDate)
+
+            SubmissionInformation(
+                    submission.id,
+                    date,
+                    buildReport.jUnitErrors(),
+                    buildReport.junitSummary(),
+                    submission.assignmentId)
         }
     }
 
-
 }
 
-class AssignmentInformation(val id: String, val language: Language, val date: String?, val html: String)
+data class AssignmentInformation(val id: String,
+                                 val language: Language,
+                                 val date: String?,
+                                 val html: String)
 
-class SubmissionInformation(val submissionId: Long,
-                            val submissionDate: Date?,
-                            val report: List<String>)
+data class SubmissionInformation(val submissionId: Long,
+                                 val submissionDate: String?,
+                                 val report: String?,
+                                 val summary: String?,
+                                 val assignmentId: String)
