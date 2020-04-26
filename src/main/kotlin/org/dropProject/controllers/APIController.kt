@@ -30,8 +30,11 @@ import org.dropProject.extensions.realName
 import org.dropProject.repository.*
 import org.dropProject.services.AssignmentTeacherFiles
 import org.dropProject.services.BuildReportBuilder
+import org.springframework.http.HttpStatus
 import org.springframework.http.RequestEntity
+import org.springframework.http.ResponseEntity
 import org.springframework.ui.ModelMap
+import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
 import java.security.Principal
 import java.text.SimpleDateFormat
@@ -78,28 +81,25 @@ class APIController(val assigneeRepository: AssigneeRepository,
     @GetMapping(value = ["/submissionsList/{assignmentId}"])
     fun getStudentAssignmentSubmissions(principal: Principal, @PathVariable assignmentId: String): List<SubmissionInformation> {
 
-        val submissionsList = submissionRepository.findBySubmitterUserIdAndAssignmentId(principal.realName(), assignmentId)
+            val submissionsList = submissionRepository.findBySubmitterUserIdAndAssignmentId(principal.realName(), assignmentId)
 
-        return submissionsList.map { submission ->
-            val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
-            val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
-                    submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
-            val buildReportDB = buildReportRepository.getOne(submission.buildReportId)
-            val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
-                    mavenizedProjectFolder.absolutePath, assignment, submission)
+            return submissionsList.map { submission ->
+                val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
+                val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
+                        submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
+                val buildReportDB = buildReportRepository.getOne(submission.buildReportId)
+                val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
+                        mavenizedProjectFolder.absolutePath, assignment, submission)
 
+                val date = dateFormater.format(submission.submissionDate)
 
-            submission.structureErrors?.split(";")
-
-            val date = dateFormater.format(submission.submissionDate)
-
-            SubmissionInformation(
-                    submission.id,
-                    date,
-                    buildReport.jUnitErrors(),
-                    buildReport.junitSummary(),
-                    submission.assignmentId)
-        }
+                SubmissionInformation(
+                        submission.id,
+                        date,
+                        buildReport.jUnitErrors(),
+                        buildReport.junitSummary(),
+                        submission.assignmentId)
+            }
     }
 
 }

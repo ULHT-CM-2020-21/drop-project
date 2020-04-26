@@ -91,7 +91,7 @@ class APIControllerTest {
                     .andExpect(status().isOk)
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     // .andDo(MockMvcResultHandlers.print())
-                    .andExpect(jsonPath("$[0].assignmentId", Matchers.equalTo("dummyAssignment1")))
+                    .andExpect(jsonPath("$[0].id", Matchers.equalTo("dummyAssignment1")))
                     .andExpect(jsonPath("$[0].language", Matchers.equalTo("KOTLIN")))
 
         } finally {
