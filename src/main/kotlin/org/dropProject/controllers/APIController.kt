@@ -106,18 +106,28 @@ class APIController(val assigneeRepository: AssigneeRepository,
                 val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
                 val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                         submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
-                val buildReportDB = buildReportRepository.getOne(submission.buildReportId!!)
-                val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
-                        mavenizedProjectFolder.absolutePath, assignment, submission)
 
-                val date = dateFormater.format(submission.submissionDate)
+                if (submission.buildReportId != null) {
+                    val buildReportDB = buildReportRepository.getOne(submission.buildReportId!!)
+                    val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
+                            mavenizedProjectFolder.absolutePath, assignment, submission)
 
-                SubmissionInformation(
-                        submission.id,
-                        date,
-                        buildReport.jUnitErrors(),
-                        buildReport.junitSummary(),
-                        submission.assignmentId)
+                    val date = dateFormater.format(submission.submissionDate)
+
+                    SubmissionInformation(
+                            submission.id,
+                            date,
+                            buildReport.jUnitErrors(),
+                            buildReport.junitSummary(),
+                            submission.assignmentId)
+                } else {
+                    SubmissionInformation(
+                            submission.id,
+                            dateFormater.format(submission.submissionDate),
+                            "",
+                            "",
+                            submission.assignmentId)
+                }
             }
     }
 
