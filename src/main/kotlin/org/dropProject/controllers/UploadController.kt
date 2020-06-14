@@ -415,7 +415,7 @@ class UploadController(
         }
         FileUtils.copyFile(File(projectFolder, "AUTHORS.txt"),File(mavenizedProjectFolder, "AUTHORS.txt"))
         if (submission.gitSubmissionId == null && deleteOriginalProjectFolder) {  // don't delete git submissions
-            FileUtils.deleteDirectory(projectFolder)  // TODO: This seems duplicate with the lines below...
+            // FileUtils.deleteDirectory(projectFolder)  // TODO: This seems duplicate with the lines below...
         }
 
         // next, copy the project files submitted by the teachers (will override eventually the student files)

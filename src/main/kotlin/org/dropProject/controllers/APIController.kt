@@ -106,7 +106,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                 val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
                 val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                         submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
-                val buildReportDB = buildReportRepository.getOne(submission.buildReportId)
+                val buildReportDB = buildReportRepository.getOne(submission.buildReportId!!)
                 val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
                         mavenizedProjectFolder.absolutePath, assignment, submission)
 
