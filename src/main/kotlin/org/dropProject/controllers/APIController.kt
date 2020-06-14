@@ -125,7 +125,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.id,
                             dateFormater.format(submission.submissionDate),
                             "",
-                            "",
+                            "A submissão ainda não foi validada. Aguarde...",
                             submission.assignmentId)
                 }
             }
