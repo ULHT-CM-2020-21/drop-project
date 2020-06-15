@@ -264,7 +264,6 @@ class UploadController(
 
         if (projectFolder != null) {
              val authors = getProjectAuthors(projectFolder)
-            //val authors = listOf(AuthorDetails("Yash Jahit", "a21705201", true))
             LOG.info("[${authors.joinToString(separator = "|")}] Received ${file.originalFilename}")
 
             // check if the principal is one of group elements
