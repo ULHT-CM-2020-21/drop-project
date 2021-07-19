@@ -221,8 +221,9 @@ class ReportController(
             val projectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                     wasRebuilt = submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
             LOG.info("[${principal.realName()}] downloaded ${projectFolder.name}")
-
+            println("*** " + projectFolder)
             val zipFilename = submission.group.authorsStr().replace(",", "_") + "_mavenized"
+            println("*** " + zipFilename)
             val zipFile = zipService.createZipFromFolder(zipFilename, projectFolder)
 
             LOG.info("Created ${zipFile.file.absolutePath}")
@@ -431,7 +432,7 @@ class ReportController(
             } catch (e: Exception) {
                 println("e = ${e}")
             }
-
+            println("***" + tempFolder)
             val zipFilename = tempFolder.name
             val zipFile = zipService.createZipFromFolder(zipFilename, tempFolder)
 

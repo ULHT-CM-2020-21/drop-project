@@ -40,6 +40,7 @@ package org.dropProject.controllers
 import org.apache.poi.ss.formula.functions.T
 import org.springframework.web.bind.annotation.*
 import org.dropProject.dao.Language
+import org.dropProject.dao.ProjectGroup
 import org.dropProject.dao.Submission
 import org.dropProject.dao.SubmissionStatus
 import org.dropProject.data.JUnitSummary
@@ -91,55 +92,120 @@ class APIController(val assigneeRepository: AssigneeRepository,
         }
 
         return listAssigment.map { assignment ->
+
             val html = assignmentTeacherFiles.getHtmlInstructionsFragment(assignment)
             html.replace("\"", "\\\"")
-            AssignmentInformation(assignment.id, assignment.language, assignment.dueDate?.format(formatter), html)
+            AssignmentInformation(assignment.id,
+                    assignment.name,
+                    assignment.language,
+                    assignment.dueDate.toString(),assignment.numSubmissions,html,assignment.lastSubmissionDate,assignment.active)
         }
     }
 
     @GetMapping(value = ["/submissionsList/{assignmentId}"])
     fun getStudentAssignmentSubmissions(principal: Principal, @PathVariable assignmentId: String): List<SubmissionInformation> {
 
-            val submissionsList = submissionRepository.findBySubmitterUserIdAndAssignmentId(principal.realName(), assignmentId)
-
+            val submissionsList = submissionRepository.findByAssignmentId(assignmentId)
+            //submissionRepository.findBySubmitterUserIdAndAssignmentId
+            println("ola")
             return submissionsList.map { submission ->
                 val assignment = assignmentRepository.findById(submission.assignmentId).orElse(null)
                 val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                         submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
-
+                println("ole")
                 if (submission.buildReportId != null) {
                     val buildReportDB = buildReportRepository.getOne(submission.buildReportId!!)
+                    println("ola2 ")
                     val buildReport = buildReportBuilder.build(buildReportDB.buildReport.split("\n"),
                             mavenizedProjectFolder.absolutePath, assignment, submission)
+                    println("ola3 +" + submission.submissionDate)
 
                     val date = dateFormater.format(submission.submissionDate)
+                    try{
+                        println(">>>> " )
+                        println(buildReport)
+                    }catch (e: Exception){
+                        println("tamos aqui" +  e.message)
+                    }
 
                     SubmissionInformation(
                             submission.id,
+                            submission.group.id,
+                            submission.group.authors.toString(),
+                            submission.submitterUserId,
                             date,
                             buildReport.jUnitErrors(),
                             buildReport.junitSummary(),
+                            submission.getStatus().toString(),
+                            submission.structureErrors,
+                            submission.teacherTests?.toStr(),
+                            submission.hiddenTests?.toStr(),
+                            submission.studentTests?.toStr(),
+                            submission.ellapsed,
+                            submission.coverage,
+                            submission.markedAsFinal,
                             submission.assignmentId)
-                } else {
-                    SubmissionInformation(
+                            } else {
+                            SubmissionInformation(
                             submission.id,
+                            submission.group.id,
+                            submission.group.authors.toString(),
+                            submission.submitterUserId,
                             dateFormater.format(submission.submissionDate),
                             "",
                             "A submissão ainda não foi validada. Aguarde...",
+                            submission.getStatus().toString(),
+                            submission.structureErrors,
+
+                            submission.teacherTests?.toStr(),
+                            submission.hiddenTests?.toStr(),
+                            submission.studentTests?.toStr(),
+
+
+                            submission.ellapsed,
+                            submission.coverage,
+                            submission.markedAsFinal,
                             submission.assignmentId)
-                }
-            }
-    }
+                            }
+                            }
+
+}
+@GetMapping(value = ["/teacherAssignmentList"])
+fun getTeacherAssignmentList(principal: Principal): List<AssignmentInformation> {
+var result = mutableListOf<AssignmentInformation>()
+for(assignment in assignmentRepository.findAll()) {
+result.add(AssignmentInformation(assignment.id,
+assignment.name,
+assignment.language,
+assignment.dueDate.toString(),assignment.numSubmissions,assignmentTeacherFiles.getHtmlInstructionsFragment(assignment).replace("\"", "\\\"") ,assignment.lastSubmissionDate,assignment.active))
+}
+return result;
+}
 
 }
 
 data class AssignmentInformation(val id: String,
-                                 val language: Language,
-                                 val date: String?,
-                                 val html: String)
+        val name: String,
+        val language: Language,
+        val date: String?,
+        val numSubmissions: Int,
+        val html: String,
+        val lastSubmissionDate: Date?,
+        val active: Boolean)
 
-data class SubmissionInformation(val submissionId: Long,
-                                 val submissionDate: String?,
-                                 val report: String?,
-                                 val summary: String?,
-                                 val assignmentId: String)
+        data class SubmissionInformation(val submissionId: Long,
+        var idGroup : Long,
+        var groupAuthors: String,
+        val submitterUserId : String,
+        val submissionDate: String?,
+        val report: String?,
+        val summary: String?,
+        val status: String,
+        val structureErrors: String?,
+        val teacherTests: String?,
+        val hiddenTests: String?,
+        val studentTests: String?,
+        val elapsed: BigDecimal?,
+        val coverage: Int?,
+        val markedAsFinal: Boolean,
+        val assignmentId: String)
