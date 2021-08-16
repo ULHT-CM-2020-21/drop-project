@@ -136,12 +136,13 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             date,
                             buildReport.jUnitErrors(),
                             buildReport.junitSummary(),
+
                             submission.getStatus().toString(),
                             submission.structureErrors,
                             submission.teacherTests?.toStr(),
                             submission.hiddenTests?.toStr(),
                             submission.studentTests?.toStr(),
-                            submission.ellapsed,
+                            submission.ellapsed.toString(),
                             submission.coverage,
                             submission.markedAsFinal,
                             submission.assignmentId)
@@ -162,7 +163,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.studentTests?.toStr(),
 
 
-                            submission.ellapsed,
+                            submission.ellapsed.toString(),
                             submission.coverage,
                             submission.markedAsFinal,
                             submission.assignmentId)
@@ -205,7 +206,7 @@ data class AssignmentInformation(val id: String,
         val teacherTests: String?,
         val hiddenTests: String?,
         val studentTests: String?,
-        val elapsed: BigDecimal?,
+        val elapsed: String,
         val coverage: Int?,
         val markedAsFinal: Boolean,
         val assignmentId: String)
