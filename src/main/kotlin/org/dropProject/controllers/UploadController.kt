@@ -414,7 +414,10 @@ class UploadController(
         }
         FileUtils.copyFile(File(projectFolder, "AUTHORS.txt"),File(mavenizedProjectFolder, "AUTHORS.txt"))
         if (submission.gitSubmissionId == null && deleteOriginalProjectFolder) {  // don't delete git submissions
-             FileUtils.deleteDirectory(projectFolder)  // TODO: This seems duplicate with the lines below...
+            //"FIXME esta linha rebenta quando se faz download mavenized no Windows"
+            //"Comentar esta linha permite que o download não rebente, mas a submissão que é devolvida é a solução de referência
+            //e não a submissão que se se tentou sacar."
+         //    FileUtils.deleteDirectory(projectFolder)  // TODO: This seems duplicate with the lines below...
         }
 
         // next, copy the project files submitted by the teachers (will override eventually the student files)

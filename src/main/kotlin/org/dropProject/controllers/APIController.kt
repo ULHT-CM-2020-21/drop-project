@@ -113,6 +113,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                 val mavenizedProjectFolder = assignmentTeacherFiles.getProjectFolderAsFile(submission,
                         submission.getStatus() == SubmissionStatus.VALIDATED_REBUILT)
                 println("ole")
+                println(submission)
                 if (submission.buildReportId != null) {
                     val buildReportDB = buildReportRepository.getOne(submission.buildReportId!!)
                     println("ola2 ")
@@ -128,6 +129,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                         println("tamos aqui" +  e.message)
                     }
 
+
                     SubmissionInformation(
                             submission.id,
                             submission.group.id,
@@ -135,14 +137,11 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.submitterUserId,
                             date,
                             buildReport.jUnitErrors(),
-                            buildReport.junitSummary(),
-
+                            buildReport.junitSummary(TestType.TEACHER),
+                            buildReport.junitSummary(TestType.STUDENT),
+                            buildReport.junitSummary(TestType.HIDDEN),
                             submission.getStatus().toString(),
-                            submission.structureErrors,
-                            submission.teacherTests?.toStr(),
-                            submission.hiddenTests?.toStr(),
-                            submission.studentTests?.toStr(),
-                            submission.ellapsed.toString(),
+                            submission.structureErrors.toString(),
                             submission.coverage,
                             submission.markedAsFinal,
                             submission.assignmentId)
@@ -154,21 +153,17 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.submitterUserId,
                             dateFormater.format(submission.submissionDate),
                             "",
-                            "A submissão ainda não foi validada. Aguarde...",
+                            "",
+                            "",
+                            "",
                             submission.getStatus().toString(),
-                            submission.structureErrors,
-
-                            submission.teacherTests?.toStr(),
-                            submission.hiddenTests?.toStr(),
-                            submission.studentTests?.toStr(),
-
-
-                            submission.ellapsed.toString(),
+                            submission.structureErrors.toString(),
                             submission.coverage,
                             submission.markedAsFinal,
                             submission.assignmentId)
                             }
                             }
+
 
 }
 @GetMapping(value = ["/teacherAssignmentList"])
@@ -188,25 +183,24 @@ return result;
 data class AssignmentInformation(val id: String,
         val name: String,
         val language: Language,
-        val date: String?,
+        val dueDate: String?,
         val numSubmissions: Int,
         val html: String,
         val lastSubmissionDate: Date?,
         val active: Boolean)
 
-        data class SubmissionInformation(val submissionId: Long,
+data class SubmissionInformation(val submissionId: Long,
         var idGroup : Long,
         var groupAuthors: String,
         val submitterUserId : String,
         val submissionDate: String?,
         val report: String?,
-        val summary: String?,
-        val status: String,
-        val structureErrors: String?,
+        //val summary: String?,
         val teacherTests: String?,
-        val hiddenTests: String?,
         val studentTests: String?,
-        val elapsed: String,
+        val hiddenTests: String?,
+        val status: String,
+        val structureErrors: String,
         val coverage: Int?,
         val markedAsFinal: Boolean,
         val assignmentId: String)
