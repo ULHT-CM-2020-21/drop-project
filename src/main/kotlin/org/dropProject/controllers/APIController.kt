@@ -38,11 +38,8 @@
 package org.dropProject.controllers
 
 import org.apache.poi.ss.formula.functions.T
+import org.dropProject.dao.*
 import org.springframework.web.bind.annotation.*
-import org.dropProject.dao.Language
-import org.dropProject.dao.ProjectGroup
-import org.dropProject.dao.Submission
-import org.dropProject.dao.SubmissionStatus
 import org.dropProject.data.JUnitSummary
 import org.dropProject.data.TestType
 import org.dropProject.extensions.formatDefault
@@ -98,7 +95,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
             AssignmentInformation(assignment.id,
                     assignment.name,
                     assignment.language,
-                    assignment.dueDate.toString(),assignment.numSubmissions,html,assignment.lastSubmissionDate,assignment.active)
+                    assignment.dueDate.toString(),assignment.numSubmissions,html,assignment.lastSubmissionDate,assignment.active,assignment.acceptsStudentTests,assignment.minStudentTests.toString(),assignment.hiddenTestsVisibility.toString())
         }
     }
 
@@ -143,6 +140,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.getStatus().toString(),
                             submission.structureErrors.toString(),
                             submission.coverage,
+                            submission.ellapsed.toString(),
                             submission.markedAsFinal,
                             submission.assignmentId)
                             } else {
@@ -159,6 +157,7 @@ class APIController(val assigneeRepository: AssigneeRepository,
                             submission.getStatus().toString(),
                             submission.structureErrors.toString(),
                             submission.coverage,
+                            submission.ellapsed.toString(),
                             submission.markedAsFinal,
                             submission.assignmentId)
                             }
@@ -173,7 +172,7 @@ for(assignment in assignmentRepository.findAll()) {
 result.add(AssignmentInformation(assignment.id,
 assignment.name,
 assignment.language,
-assignment.dueDate.toString(),assignment.numSubmissions,assignmentTeacherFiles.getHtmlInstructionsFragment(assignment).replace("\"", "\\\"") ,assignment.lastSubmissionDate,assignment.active))
+assignment.dueDate.toString(),assignment.numSubmissions,assignmentTeacherFiles.getHtmlInstructionsFragment(assignment).replace("\"", "\\\"") ,assignment.lastSubmissionDate,assignment.active,assignment.acceptsStudentTests,assignment.minStudentTests.toString(),assignment.hiddenTestsVisibility.toString()))
 }
 return result;
 }
@@ -187,7 +186,10 @@ data class AssignmentInformation(val id: String,
         val numSubmissions: Int,
         val html: String,
         val lastSubmissionDate: Date?,
-        val active: Boolean)
+        val active: Boolean,
+        val acceptsStudentTests : Boolean,
+        val minStudentTests : String,
+        val hiddenTestsVisibility: String?)
 
 data class SubmissionInformation(val submissionId: Long,
         var idGroup : Long,
@@ -202,5 +204,6 @@ data class SubmissionInformation(val submissionId: Long,
         val status: String,
         val structureErrors: String,
         val coverage: Int?,
+        val elapsed: String,
         val markedAsFinal: Boolean,
         val assignmentId: String)
